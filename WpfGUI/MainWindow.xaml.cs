@@ -56,18 +56,37 @@ namespace WpfGUI
             spSeats.Children.Clear();
             Models.SeatsVM seat = new();
             _seats = seat.LoadSeatsData(selectedId);
+            // populate first column
             foreach (var s in _seats)
             {
-                RadioButton rb = new RadioButton() { Content = s.seat_number, };
-                if (s.is_available == 0)
+                if (s.seat_number.Contains("1"))
                 {
-                    rb.IsEnabled = false;
+                    RadioButton rb = new RadioButton() { Content = s.seat_number, };
+                    if (s.is_available == 0)
+                    {
+                        rb.IsEnabled = false;
+                    }
+                    spSeats.Children.Add(rb);
+                    rb.Checked += new RoutedEventHandler(rb_Checked);
                 }
-                
-                spSeats.Children.Add(rb);
-                rb.Checked += new RoutedEventHandler(rb_Checked);
             }
-
+                
+            // populate 2nd column
+            spSeats2.Visibility = Visibility.Visible;
+            spSeats2.Children.Clear();
+            foreach (var s in _seats)
+            {
+                if (s.seat_number.Contains("2"))
+                {
+                    RadioButton rb = new RadioButton() { Content = s.seat_number, };
+                    if (s.is_available == 0)
+                    {
+                        rb.IsEnabled = false;
+                    }
+                    spSeats2.Children.Add(rb);
+                    rb.Checked += new RoutedEventHandler(rb_Checked);
+                }
+            }
         }
         void rb_Unchecked(object sender, RoutedEventArgs e)
         {   
@@ -77,10 +96,45 @@ namespace WpfGUI
         void rb_Checked(object sender, RoutedEventArgs e)
         {
             string seatNo = (sender as RadioButton).Content.ToString()!;
+
+            //clear first column
+            foreach (RadioButton rb in spSeats.Children)
+            {
+                if (rb.IsChecked == true)
+                {
+                    if (rb.Content != seatNo)
+                    {
+                        rb.IsChecked = false;
+                        break;
+                    }
+                }
+            }
+            // clear second column
+            foreach (RadioButton rb in spSeats2.Children)
+            {
+                if (rb.IsChecked == true)
+                {
+                    if (rb.Content != seatNo)
+                    {
+                        rb.IsChecked = false;
+                        break;
+                    }
+                }
+            }
         }
         private void clearChoice_Click(object sender, RoutedEventArgs e)
         {
+            //clear first column
             foreach (RadioButton rb in spSeats.Children)
+            {
+                if (rb.IsChecked == true)
+                {
+                    rb.IsChecked = false;
+                    break;
+                }
+            }
+            // clear second column
+            foreach (RadioButton rb in spSeats2.Children)
             {
                 if (rb.IsChecked == true)
                 {
@@ -92,6 +146,7 @@ namespace WpfGUI
         private void assignChoice_Click(object sender, RoutedEventArgs e)
         {
             string selectedSeat = "";
+            // column 1
             foreach (RadioButton rb in spSeats.Children) 
             {
                 if (rb.IsChecked == true) 
@@ -101,6 +156,20 @@ namespace WpfGUI
                     rb.IsEnabled = false;
                     break; 
                 } 
+            }
+            // column 2
+            if (selectedSeat == "")
+            {
+                foreach (RadioButton rb in spSeats2.Children)
+                {
+                    if (rb.IsChecked == true)
+                    {
+                        selectedSeat = rb.Content.ToString()!;
+                        rb.IsChecked = false;
+                        rb.IsEnabled = false;
+                        break;
+                    }
+                }
             }
             string selection = _selectedRouteId.ToString() + "  " + selectedSeat;
             if (!string.IsNullOrEmpty(selectedSeat))

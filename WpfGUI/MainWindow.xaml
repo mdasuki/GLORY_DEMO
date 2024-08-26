@@ -7,7 +7,6 @@
         mc:Ignorable="d"
         Title="Glory Seat Reservation" Height="650" Width="800">
     <Grid Background="LightGray">
-        
         <Grid.RowDefinitions>
             <RowDefinition Height="70" />
             <RowDefinition Height="*" />
@@ -54,13 +53,12 @@
                         DisplayMemberPath="full_station_name" SelectedValuePath="route_id" 
                               SelectionChanged="ComboBox_GetSeatSelections">
                     </ComboBox>
-
                 </StackPanel>
                 <!-- label displaying selection details -->
                 <StackPanel Grid.Row="1" Name="rtDetails" HorizontalAlignment="Center" Height="20">
                     <Label Name="lblRouteDetails" FontWeight="Bold" />
                 </StackPanel>
-                <!-- displaying seats availability -->
+                <!-- displaying buttons to clear or assign seats -->
                 <StackPanel Grid.Row="2" Name="splabel" HorizontalAlignment="Center" Visibility="Collapsed">
                     <Label Content="Available seats (1=Window; 2=Aisle)" FontWeight="Bold" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -72,9 +70,19 @@
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
+                <!-- displaying seats availability -->
                 <ScrollViewer Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Center" Width="150" Height="300" VerticalScrollBarVisibility="Auto">
-                    <StackPanel HorizontalAlignment="Center">
-                        <StackPanel x:Name="spSeats" Orientation="Vertical"/>
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                        <!-- first column -->
+                        <StackPanel Grid.Column="0" x:Name="spSeats" Orientation="Vertical"/>
+                        <!-- second column -->
+                        <StackPanel Grid.Column="0" x:Name="spSeats2" Orientation="Vertical"/>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
