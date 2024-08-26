@@ -66,6 +66,7 @@ namespace WpfGUI
                     {
                         rb.IsEnabled = false;
                     }
+                    rb.FlowDirection = FlowDirection.RightToLeft;
                     spSeats.Children.Add(rb);
                     rb.Checked += new RoutedEventHandler(rb_Checked);
                 }
