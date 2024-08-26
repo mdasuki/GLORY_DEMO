@@ -1,6 +1,8 @@
 # GLORY_DEMO
 Train reservation demo project
 
+NOTE: The source code is in master branch
+
 Train reservation demo project is a sample C# project to allow a user to reserve a seat on a train.
 The functionalities include:
 1. Lists all trains displaying destination and departure time.
