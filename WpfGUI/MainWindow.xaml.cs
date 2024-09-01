@@ -1,17 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Data;
-using System.Reflection.Emit;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using DAL;
 
 namespace WpfGUI
 {
@@ -21,21 +10,32 @@ namespace WpfGUI
     public partial class MainWindow : Window
     {
         public List<DTO.StationModel>? _destinations { get; set; }
-        public List<DTO.SeatModel> _seats { get; set; }
+        public List<DTO.SeatModel>? _seats { get; set; }
         public int _selectedRouteId;
-        public MainWindow()
+        private readonly IStationRepository _station;
+        private readonly IRouteRepository _route;
+        private readonly ISeatRepository _seat;
+
+        public MainWindow(IStationRepository station, IRouteRepository route, ISeatRepository seat)
         {
             InitializeComponent();
 
-            Models.DestinationVM destination = new();
+            // initialize dependency injection
+            _station = station;
+            _route = route;
+            _seat = seat;
+
+            //Models.DestinationVM destination = new();
+            // getting the initial destinations
             // passing 1 because assumed starting point is always atlanta in this case
-            _destinations = destination.LoadDestinationsData(1); 
+            _destinations = _station.GetDestinationStations(1); 
             DataContext = this;
+            
         }
 
         private void ComboBox_GetDestinations(object sender, SelectionChangedEventArgs e)
         {
-            Models.DestinationVM destination = new();
+            //Models.DestinationVM destination = new();
             spDestination.Visibility = Visibility.Visible;
         }
 
@@ -46,19 +46,24 @@ namespace WpfGUI
             _selectedRouteId = selectedId; // need public id to be used later when assigning seat
 
             // get route details
-            Models.DestinationVM destination = new();
-            lblRouteDetails.Content = destination.GetRouteDetails(selectedId);
+            //Models.DestinationVM destination = new();
+            lblRouteDetails.Content = _route.getRouteDetails(selectedId);
 
-            // dispay seats
+            // dispay seats first column
             splabel.Visibility = Visibility.Visible;
             spSeats.Visibility = Visibility.Visible;
-            // get seats
             spSeats.Children.Clear();
-            Models.SeatsVM seat = new();
+            // display seats second column
+            spSeats2.Visibility = Visibility.Visible;
+            spSeats2.Children.Clear();
+
+            // get seats
+            Models.SeatsVM seat = new(_seat);
             _seats = seat.LoadSeatsData(selectedId);
             // populate first column
             foreach (var s in _seats)
             {
+                // populate 1st column
                 if (s.seat_number.Contains("1"))
                 {
                     RadioButton rb = new RadioButton() { Content = s.seat_number, };
@@ -70,13 +75,7 @@ namespace WpfGUI
                     spSeats.Children.Add(rb);
                     rb.Checked += new RoutedEventHandler(rb_Checked);
                 }
-            }
-                
-            // populate 2nd column
-            spSeats2.Visibility = Visibility.Visible;
-            spSeats2.Children.Clear();
-            foreach (var s in _seats)
-            {
+                // populate 2nd column
                 if (s.seat_number.Contains("2"))
                 {
                     RadioButton rb = new RadioButton() { Content = s.seat_number, };
@@ -89,21 +88,23 @@ namespace WpfGUI
                 }
             }
         }
-        void rb_Unchecked(object sender, RoutedEventArgs e)
-        {   
-            MessageBox.Show((sender as RadioButton).Content.ToString() + " checked.");
-        }
+
+        // not using this method for now
+        //void rb_Unchecked(object sender, RoutedEventArgs e)
+        //{   
+        //    MessageBox.Show((sender as RadioButton).Content.ToString() + " checked.");
+        //}
 
         void rb_Checked(object sender, RoutedEventArgs e)
         {
-            string seatNo = (sender as RadioButton).Content.ToString()!;
+            string seatNo = ((RadioButton?)sender!).Content.ToString()!;
 
             //clear first column
             foreach (RadioButton rb in spSeats.Children)
             {
                 if (rb.IsChecked == true)
                 {
-                    if (rb.Content != seatNo)
+                    if ((string)rb.Content != seatNo)
                     {
                         rb.IsChecked = false;
                         break;
@@ -115,7 +116,7 @@ namespace WpfGUI
             {
                 if (rb.IsChecked == true)
                 {
-                    if (rb.Content != seatNo)
+                    if ((string)rb.Content != seatNo)
                     {
                         rb.IsChecked = false;
                         break;
@@ -175,7 +176,7 @@ namespace WpfGUI
             string selection = _selectedRouteId.ToString() + "  " + selectedSeat;
             if (!string.IsNullOrEmpty(selectedSeat))
             {
-                Models.SeatsVM seat = new();
+                Models.SeatsVM seat = new(_seat);
                 var res = seat.AssignSeat(_selectedRouteId, selectedSeat);
                 if (res != null)
                 {

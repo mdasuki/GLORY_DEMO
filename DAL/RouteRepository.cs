@@ -1,16 +1,11 @@
 ﻿using Dapper;
 using DTO;
 using Microsoft.Data.Sqlite;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class RouteRepository
+    public class RouteRepository : IRouteRepository
     {
         public RouteModel getRouteDetails(int routeId)
         {

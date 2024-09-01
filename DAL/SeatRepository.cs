@@ -1,16 +1,11 @@
 ﻿using Dapper;
 using DTO;
 using Microsoft.Data.Sqlite;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class SeatRepository
+    public class SeatRepository : ISeatRepository
     {
         public List<SeatModel> getSeats(int routeId)
         {
@@ -62,7 +57,7 @@ namespace DAL
                 string sql = "update seats set is_available = 0 where id = @seatid";
                 using (IDbConnection con = new SqliteConnection(DbHelper.Instance.LoadConnectionString()))
                 {
-                    cnt = con.Execute(sql, new {seatid = seatId});
+                    cnt = con.Execute(sql, new { seatid = seatId });
                 }
                 if (cnt > 0)
                 {

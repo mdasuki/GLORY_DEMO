@@ -1,16 +1,11 @@
 ﻿using Dapper;
 using DTO;
 using Microsoft.Data.Sqlite;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class StationRepository
+    public class StationRepository : IStationRepository
     {
         public List<StationModel> GetDestinationStations(int sourceStationId)
         {
@@ -25,7 +20,7 @@ namespace DAL
                             where s.id != @source_station_id";
                 using (IDbConnection con = new SqliteConnection(DbHelper.Instance.LoadConnectionString()))
                 {
-                    stationList = con.Query<StationModel>(sql, new {source_station_id = sourceStationId}).ToList();
+                    stationList = con.Query<StationModel>(sql, new { source_station_id = sourceStationId }).ToList();
                 }
             }
             catch (Exception ex)
